@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A20616381F049012004CDC86 /* XYTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20616371F049012004CDC86 /* XYTestViewController.swift */; };
+		A206163F1F04D90C004CDC86 /* XYSlideMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = A206163E1F04D90C004CDC86 /* XYSlideMenuView.m */; };
 		A247B3161F038BF200B52163 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A247B3151F038BF200B52163 /* AppDelegate.swift */; };
 		A247B3181F038BF200B52163 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A247B3171F038BF200B52163 /* ViewController.swift */; };
 		A247B31B1F038BF200B52163 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A247B3191F038BF200B52163 /* Main.storyboard */; };
@@ -35,6 +37,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A20616371F049012004CDC86 /* XYTestViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XYTestViewController.swift; sourceTree = "<group>"; };
+		A206163C1F04D90C004CDC86 /* XYSlideMenu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "XYSlideMenu-Bridging-Header.h"; sourceTree = "<group>"; };
+		A206163D1F04D90C004CDC86 /* XYSlideMenuView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYSlideMenuView.h; sourceTree = "<group>"; };
+		A206163E1F04D90C004CDC86 /* XYSlideMenuView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XYSlideMenuView.m; sourceTree = "<group>"; };
 		A247B3121F038BF200B52163 /* XYSlideMenu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = XYSlideMenu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A247B3151F038BF200B52163 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A247B3171F038BF200B52163 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -101,11 +107,15 @@
 			children = (
 				A247B3151F038BF200B52163 /* AppDelegate.swift */,
 				A247B3171F038BF200B52163 /* ViewController.swift */,
+				A20616371F049012004CDC86 /* XYTestViewController.swift */,
 				A247B3431F038C8D00B52163 /* XYSlideMenu.swift */,
+				A206163D1F04D90C004CDC86 /* XYSlideMenuView.h */,
+				A206163E1F04D90C004CDC86 /* XYSlideMenuView.m */,
 				A247B3191F038BF200B52163 /* Main.storyboard */,
 				A247B31C1F038BF200B52163 /* Assets.xcassets */,
 				A247B31E1F038BF200B52163 /* LaunchScreen.storyboard */,
 				A247B3211F038BF200B52163 /* Info.plist */,
+				A206163C1F04D90C004CDC86 /* XYSlideMenu-Bridging-Header.h */,
 			);
 			path = XYSlideMenu;
 			sourceTree = "<group>";
@@ -197,6 +207,7 @@
 					A247B3111F038BF200B52163 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = M92773JU7J;
+						LastSwiftMigration = 0820;
 						ProvisioningStyle = Automatic;
 					};
 					A247B3251F038BF200B52163 = {
@@ -266,6 +277,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A247B3181F038BF200B52163 /* ViewController.swift in Sources */,
+				A20616381F049012004CDC86 /* XYTestViewController.swift in Sources */,
+				A206163F1F04D90C004CDC86 /* XYSlideMenuView.m in Sources */,
 				A247B3161F038BF200B52163 /* AppDelegate.swift in Sources */,
 				A247B3441F038C8D00B52163 /* XYSlideMenu.swift in Sources */,
 			);
@@ -419,12 +432,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = M92773JU7J;
 				INFOPLIST_FILE = XYSlideMenu/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xueyang.XYSlideMenu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "XYSlideMenu/XYSlideMenu-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -433,12 +449,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				DEVELOPMENT_TEAM = M92773JU7J;
 				INFOPLIST_FILE = XYSlideMenu/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = xueyang.XYSlideMenu;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "XYSlideMenu/XYSlideMenu-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -520,6 +538,7 @@
 				A247B33C1F038BF200B52163 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A247B33D1F038BF200B52163 /* Build configuration list for PBXNativeTarget "XYSlideMenuTests" */ = {
 			isa = XCConfigurationList;
@@ -528,6 +547,7 @@
 				A247B33F1F038BF200B52163 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A247B3401F038BF200B52163 /* Build configuration list for PBXNativeTarget "XYSlideMenuUITests" */ = {
 			isa = XCConfigurationList;
@@ -536,6 +556,7 @@
 				A247B3421F038BF200B52163 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

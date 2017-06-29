@@ -8,7 +8,15 @@
 
 import UIKit
 
+enum XYSlideMenuIndicatorType {
+    case normal
+    case stretch
+    case stretchAndMove
+}
+
 class XYSlideMenu: UIView {
+    
+    //MARK: - properties
     
     private var titles: [String]
     
@@ -16,7 +24,11 @@ class XYSlideMenu: UIView {
     
     private var tabScrollView: UIScrollView = UIScrollView()
     
+    private var mainScrollView: UIScrollView = UIScrollView()
+    
     private var itemSelectedIndex: Int = 0
+    
+    var indicatorType: XYSlideMenuIndicatorType = .normal
     
     //tab的边距
     private var itemMargin: CGFloat = 15.0
@@ -25,11 +37,26 @@ class XYSlideMenu: UIView {
     
     private let indicatorView: UIView = UIView()
     
-    private lazy var line: UIView = {
+    private var leftIndex = 0
+    private var rightIndex = 0
+    
+    //伸缩动画的偏移量
+    fileprivate let indicatorAnimatePadding: CGFloat = 8.0
+//    private var isSlideRight: Bool = true
+    
+    //底部横线
+    private lazy var line: UIView = { [unowned self] in
         let line = UIView()
         line.backgroundColor = UIColor.lightGray
         line.frame = CGRect(x: 0, y: self.bounds.height - 0.5, width: self.bounds.width, height: 0.5)
         return line
+    }()
+    
+    //背景模糊
+    private lazy var blurView: UIVisualEffectView = { [unowned self] in
+        let blurView = UIVisualEffectView(effect: UIBlurEffect.init(style: .light))
+        blurView.frame = self.bounds
+        return blurView
     }()
     
     //标题字体
@@ -73,15 +100,45 @@ class XYSlideMenu: UIView {
         controllers = childControllers
         super.init(frame: frame)
         
+        backgroundColor = UIColor.white.withAlphaComponent(0.8)
+        
+        addSubview(blurView)
         setupTabScrollView()
         setupIndicatorView()
         
         addSubview(line)
+        
+        
+        
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
         
+        setupMainScrollView()
+    }
+    
+    //MARK: --- 配置控制器滑动scrollView
+    private func setupMainScrollView() {
+        if mainScrollView.superview == nil {
+            mainScrollView.frame = (self.superview?.bounds)!
+            self.superview?.insertSubview(mainScrollView, belowSubview: self)
+            mainScrollView.contentSize = CGSize(width: CGFloat(controllers.count) * mainScrollView.bounds.width, height: 0)
+            mainScrollView.bounces = false
+            mainScrollView.isPagingEnabled = true
+            mainScrollView.delegate = self
+        }
+        
+        setupChildControllers()
+    
+    }
+    
+    //MARK: --- 配置子控制器
+    private func setupChildControllers() {
+        for (index,vc) in controllers.enumerated() {
+            mainScrollView.addSubview(vc.view)
+            vc.view.frame = CGRect(x: CGFloat(index) * mainScrollView.bounds.width, y: 0, width: mainScrollView.bounds.width, height: mainScrollView.bounds.height)
+        }
     }
     
     //MARK: --- 配置导航栏
@@ -130,8 +187,14 @@ class XYSlideMenu: UIView {
         if item == items[itemSelectedIndex] { return }
         let fromIndex = itemSelectedIndex
         itemSelectedIndex = items.index(of: item)!
+        
         changeItemTitle(fromIndex, to: itemSelectedIndex)
         changeIndicatorViewPosition(fromIndex, to: itemSelectedIndex)
+        
+        
+        resetTabScrollViewContentOffset(item)
+        
+        resetMainScrollViewContentOffset(itemSelectedIndex)
         
     }
     //MARK: --- 改变itemTitle
@@ -169,10 +232,133 @@ class XYSlideMenu: UIView {
         
         indicatorView.frame = frame
         indicatorView.backgroundColor = itemSelectedColor
+        
+        indicatorView.layer.cornerRadius = frame.height * 0.5
+        indicatorView.layer.masksToBounds = true
     }
     
+    //点击item 修改tabScrollView的偏移量
+    private func resetTabScrollViewContentOffset(_ item: UILabel) {
+        var destinationX: CGFloat = 0
+        let itemCenterX = item.center.x
+        let scrollHalfWidth = tabScrollView.bounds.width / 2
+        //item中心点超过最高滚动范围时
+        if tabScrollView.contentSize.width - itemCenterX < scrollHalfWidth {
+            destinationX = tabScrollView.contentSize.width - scrollHalfWidth * 2
+            tabScrollView.setContentOffset(CGPoint(x: destinationX, y: 0), animated: true)
+            return
+        }
+        //item中心点低于最低滚动范围时
+        if itemCenterX > scrollHalfWidth{
+            destinationX = itemCenterX - scrollHalfWidth
+            tabScrollView.setContentOffset(CGPoint(x: destinationX, y: 0), animated: true)
+            return
+        }
+        
+        tabScrollView.setContentOffset(CGPoint(x: 0, y:0), animated: true)
+        
+    }
+    
+    //点击item 修改mainScrollView的偏移量
+    private func resetMainScrollViewContentOffset(_ index: Int) {
+        mainScrollView.setContentOffset(CGPoint(x: CGFloat(index) * mainScrollView.bounds.width, y: 0), animated: false)
+    }
+    
+    fileprivate func changeItemStatusBecauseDealNormalIndicatorType() {
+        let to = Int(mainScrollView.contentOffset.x / mainScrollView.bounds.width)
+        let toItem = items[to]
+        let g = toItem.gestureRecognizers
+        itemDidClicked(g?.first as! UITapGestureRecognizer)
+    }
+    
+    //MARK: --- 处理normal状态的 indicatorView
+    fileprivate func dealNormalIndicatorType(_ offsetX: CGFloat) {
+        if offsetX <= 0 {
+            //左边界
+            leftIndex = 0
+            rightIndex = 0
+            
+        } else if offsetX >= mainScrollView.contentSize.width {
+            //右边界
+            leftIndex = items.count - 1
+            rightIndex = leftIndex
+        } else {
+            //中间
+            leftIndex = Int(offsetX / mainScrollView.bounds.width)
+            rightIndex = leftIndex + 1
+        }
+        
+        let ratio = offsetX / mainScrollView.bounds.width - CGFloat(leftIndex)
+        if ratio == 0 { return }
+        
+        let leftItem = items[leftIndex]
+        let rightItem = items[rightIndex]
+        
+        let totalSpace = rightItem.center.x - leftItem.center.x
+        indicatorView.center = CGPoint(x:leftItem.center.x + totalSpace * ratio, y: indicatorView.center.y)
+    }
+    
+    //MARK: --- 处理followText状态的 indicatorView
+    fileprivate func dealFollowTextIndicatorType(_ offsetX: CGFloat) {
+        if offsetX <= 0 {
+            //左边界
+            leftIndex = 0
+            rightIndex = 0
+            
+        } else if offsetX >= mainScrollView.contentSize.width {
+            //右边界
+            leftIndex = items.count - 1
+            rightIndex = leftIndex
+        } else {
+            //中间
+            leftIndex = Int(offsetX / mainScrollView.bounds.width)
+            rightIndex = leftIndex + 1
+        }
+        
+        let ratio = offsetX / mainScrollView.bounds.width - CGFloat(leftIndex)
+        if ratio == 0 { return }
+        
+        let leftItem = items[leftIndex]
+        let rightItem = items[rightIndex]
+        
+        //-
+        let distance: CGFloat = indicatorType == .stretch ? 0 : indicatorAnimatePadding
+        var frame = self.indicatorView.frame
+        let maxWidth = rightItem.frame.maxX - leftItem.frame.minX - distance * 2
+        
+        if ratio <= 0.5 {
+            frame.size.width = leftItem.frame.width + (maxWidth - leftItem.frame.width) * (ratio / 0.5)
+            frame.origin.x = leftItem.frame.minX + distance * (ratio / 0.5)
+        } else {
+            frame.size.width = rightItem.frame.width + (maxWidth - rightItem.frame.width) * ((1 - ratio) / 0.5)
+            frame.origin.x = rightItem.frame.maxX - frame.size.width - distance * ((1 - ratio) / 0.5)
+        }
+        
+        self.indicatorView.frame = frame
+    }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+}
+
+//MARK: - UIScrollViewDelegate
+extension XYSlideMenu: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let offsetX = scrollView.contentOffset.x
+        switch indicatorType {
+        case .normal:
+            dealNormalIndicatorType(offsetX)
+        case .stretch:
+            dealFollowTextIndicatorType(offsetX)
+        case .stretchAndMove:
+            dealFollowTextIndicatorType(offsetX)
+        }
+    }
+    
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        changeItemStatusBecauseDealNormalIndicatorType()
+    }
+    
 }
