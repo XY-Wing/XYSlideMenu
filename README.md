@@ -1,6 +1,7 @@
 # XYSlideMenu
-# scrollView 联动
+- scrollView 联动
 - OC 与 Swift 两个版本都有。 混合在一块
+#
 !(image)[https://github.com/XY-Wing/XYSlideMenu/blob/master/GIF/scroll.gif]
 # 使用方式
 - Swift
